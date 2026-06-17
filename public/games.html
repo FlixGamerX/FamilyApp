@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spiele</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="top-bar">
+      <h1>Spiele</h1>
+      <a href="/">Zurück</a>
+    </header>
+
+    <section class="games-panel">
+      <div class="card games-card">
+        <div class="games-top">
+          <span class="games-status" id="game-status">Warte auf Spielstart</span>
+          <button class="secondary-btn" id="game-reset" type="button">Neu starten</button>
+        </div>
+
+        <div class="room-controls">
+          <div class="room-actions">
+            <button class="primary-btn" id="create-room" type="button">Raum erstellen</button>
+            <button class="secondary-btn" id="join-room" type="button">Beitreten</button>
+            <button class="secondary-btn" id="leave-room" type="button">Verlassen</button>
+          </div>
+          <div class="room-actions">
+            <input id="room-input" type="text" maxlength="5" placeholder="Code eingeben" />
+          </div>
+          <div class="room-meta">
+            <span id="room-info">Kein Raum verbunden</span>
+            <span id="room-code">—</span>
+          </div>
+          <div class="room-error" id="room-error"></div>
+        </div>
+
+        <div class="game-board" id="game-board">
+          <button class="cell" data-index="0" type="button"></button>
+          <button class="cell" data-index="1" type="button"></button>
+          <button class="cell" data-index="2" type="button"></button>
+          <button class="cell" data-index="3" type="button"></button>
+          <button class="cell" data-index="4" type="button"></button>
+          <button class="cell" data-index="5" type="button"></button>
+          <button class="cell" data-index="6" type="button"></button>
+          <button class="cell" data-index="7" type="button"></button>
+          <button class="cell" data-index="8" type="button"></button>
+        </div>
+        <div class="game-meta">
+          <span id="game-players">X: wartet · O: wartet</span>
+          <span>Mehrspieler-Spiel</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Familien App</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="top-bar">
+      <h1>Familien App</h1>
+      <a href="/">Dashboard</a>
+    </header>
+
+    <section class="dashboard-grid">
+      <div class="card summary-panel">
+        <div class="summary-row">
+          <span>Offene Aufgaben</span>
+          <strong id="today-count">0</strong>
+        </div>
+        <div class="summary-row">
+          <span>Termine</span>
+          <strong id="event-count">0</strong>
+        </div>
+        <div class="summary-row">
+          <span>Gesamt Aufgaben</span>
+          <strong id="todo-count">0</strong>
+        </div>
+        <div class="summary-row">
+          <span>Nächster Termin</span>
+          <strong id="next-event">Kein Termin</strong>
+        </div>
+        <div class="quick-actions">
+          <a href="/calendar.html">Termine</a>
+          <a href="/todo.html">To-Do</a>
+          <a href="/games.html">Spiele</a>
+        </div>
+      </div>
+
+      <section class="nav-grid">
+        <a class="nav-card" href="/calendar.html">
+          <h2>Kalender</h2>
+          <p>Termine planen und teilen</p>
+        </a>
+        <a class="nav-card" href="/todo.html">
+          <h2>To-Do</h2>
+          <p>Aufgaben verwalten</p>
+        </a>
+        <a class="nav-card" href="/games.html">
+          <h2>Spiele</h2>
+          <p>Mehrspieler-Räume gemeinsam nutzen</p>
+        </a>
+      </section>
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

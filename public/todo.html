@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>To-Do Liste</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="top-bar">
+      <h1>To-Do Liste</h1>
+      <a href="/">Zurück</a>
+    </header>
+
+    <section class="card form-card">
+      <form id="todo-form">
+        <div class="form-row">
+          <input id="todo-input" type="text" placeholder="Neue Aufgabe" />
+          <button class="primary-btn" type="submit">Hinzufügen</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card list-card">
+      <div class="section-header">
+        <h2>Aufgaben</h2>
+        <a href="/">Dashboard</a>
+      </div>
+      <input id="todo-search" class="search-input" type="search" placeholder="Aufgaben durchsuchen" />
+      <ul id="todo-list" class="list"></ul>
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
