@@ -10,6 +10,23 @@ function formatDate(dateString) {
   });
 }
 
+function formatTime(timeString) {
+  if (!timeString) return '';
+  const [hours, minutes] = timeString.split(':').map(Number);
+  const date = new Date();
+  date.setHours(hours || 0, minutes || 0, 0, 0);
+  return date.toLocaleTimeString('de-DE', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function formatEventDateTime(event) {
+  const date = formatDate(event.date);
+  const time = event.time ? ` · ${formatTime(event.time)}` : '';
+  return `${date}${time}`;
+}
+
 function updateDashboard() {
   const todayCountEl = document.getElementById('today-count');
   const todoCountEl = document.getElementById('todo-count');
@@ -30,8 +47,14 @@ function updateDashboard() {
   }
 
   if (nextEventEl) {
-    const upcoming = [...state.events].sort((a, b) => a.date.localeCompare(b.date))[0];
-    nextEventEl.textContent = upcoming ? `${upcoming.text} · ${formatDate(upcoming.date)}` : 'Kein Termin';
+    const upcoming = [...state.events].sort((a, b) => {
+      const dateCompare = a.date.localeCompare(b.date);
+      if (dateCompare !== 0) return dateCompare;
+      return (a.time || '').localeCompare(b.time || '');
+    })[0];
+    nextEventEl.textContent = upcoming
+      ? `${upcoming.text} · ${formatEventDateTime(upcoming)}`
+      : 'Kein Termin';
   }
 }
 
@@ -42,7 +65,8 @@ function renderEvents() {
   const search = document.getElementById('event-search');
   const query = search ? search.value.trim().toLowerCase() : '';
   const filtered = state.events.filter((event) => {
-    return !query || `${event.text} ${event.date}`.toLowerCase().includes(query);
+    const searchable = `${event.text} ${event.date} ${event.time || ''} ${formatEventDateTime(event)}`.toLowerCase();
+    return !query || searchable.includes(query);
   });
 
   if (!filtered.length) {
@@ -58,7 +82,7 @@ function renderEvents() {
       <main>
         <div>
           <strong>${event.text}</strong>
-          <small>${formatDate(event.date)}</small>
+          <small>${formatEventDateTime(event)}</small>
         </div>
       </main>
       <button class="icon-btn" data-remove-event="${event.id}" aria-label="Termin entfernen">✕</button>
@@ -100,25 +124,31 @@ function renderTodos() {
 function initCalendar() {
   const form = document.getElementById('event-form');
   const inputDate = document.getElementById('event-date');
+  const inputTime = document.getElementById('event-time');
   const inputText = document.getElementById('event-text');
   const list = document.getElementById('event-list');
   const search = document.getElementById('event-search');
 
-  if (!form || !inputDate || !inputText || !list) return;
+  if (!form || !inputDate || !inputTime || !inputText || !list) return;
 
   const today = new Date().toISOString().split('T')[0];
+  const nowTime = new Date();
+  const defaultTime = `${String(nowTime.getHours()).padStart(2, '0')}:${String(nowTime.getMinutes()).padStart(2, '0')}`;
   inputDate.value = today;
+  inputTime.value = defaultTime;
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     const date = inputDate.value;
+    const time = inputTime.value;
     const text = inputText.value.trim();
 
     if (!date || !text) return;
 
-    socket.emit('event:add', { date, text });
+    socket.emit('event:add', { date, time, text });
     form.reset();
     inputDate.value = today;
+    inputTime.value = defaultTime;
   });
 
   list.addEventListener('click', (event) => {
@@ -163,6 +193,129 @@ function initTodo() {
   if (search) {
     search.addEventListener('input', renderTodos);
   }
+}
+
+function getCardLabel(card) {
+  return `${card.value} ${card.color}`;
+}
+
+function shuffle(array) {
+  const next = [...array];
+  for (let i = next.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [next[i], next[j]] = [next[j], next[i]];
+  }
+  return next;
+}
+
+function initUnoGame() {
+  const topCard = document.getElementById('uno-top-card');
+  const hand = document.getElementById('uno-hand');
+  const drawBtn = document.getElementById('uno-draw');
+  const resetBtn = document.getElementById('uno-reset');
+  const status = document.getElementById('uno-status');
+
+  if (!topCard || !hand || !drawBtn || !resetBtn || !status) return;
+
+  const colors = ['rot', 'blau', 'grün', 'gelb'];
+  let deck = [];
+  let discard = [];
+  let playerHand = [];
+
+  function createDeck() {
+    const cards = [];
+    colors.forEach((color) => {
+      for (let value = 0; value <= 9; value += 1) {
+        cards.push({ color, value });
+      }
+    });
+    return shuffle(cards);
+  }
+
+  function canPlay(card) {
+    const top = discard[discard.length - 1];
+    return !top || card.color === top.color || card.value === top.value;
+  }
+
+  function replenishDeck() {
+    if (discard.length <= 1) return;
+    const top = discard.pop();
+    deck = shuffle(discard);
+    discard = [top];
+  }
+
+  function updateUnoUI() {
+    topCard.textContent = discard.length ? `${discard[discard.length - 1].value} · ${discard[discard.length - 1].color}` : '—';
+    topCard.className = 'uno-card';
+    const top = discard[discard.length - 1];
+    if (top) {
+      topCard.classList.add(`uno-card-${top.color}`);
+    } else {
+      topCard.className = 'uno-card uno-card-empty';
+    }
+
+    hand.innerHTML = '';
+    playerHand.forEach((card, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `uno-card uno-card-${card.color}`;
+      button.dataset.index = index;
+      button.textContent = `${card.value}`;
+      button.disabled = !canPlay(card);
+      hand.appendChild(button);
+    });
+
+    if (!playerHand.length) {
+      status.textContent = 'Du hast gewonnen!';
+    } else if (deck.length === 0) {
+      status.textContent = 'Der Stapel ist leer, ziehe nicht mehr';
+    } else {
+      status.textContent = `Karten im Stapel: ${deck.length}`;
+    }
+  }
+
+  function startRound() {
+    deck = createDeck();
+    discard = [];
+    playerHand = [];
+
+    for (let i = 0; i < 5; i += 1) {
+      playerHand.push(deck.pop());
+    }
+
+    discard.push(deck.pop());
+
+    while (!playerHand.some(canPlay) && deck.length > 0) {
+      playerHand.push(deck.pop());
+    }
+
+    updateUnoUI();
+  }
+
+  function drawCard() {
+    if (!deck.length) {
+      replenishDeck();
+    }
+    if (!deck.length) return;
+    playerHand.push(deck.pop());
+    updateUnoUI();
+  }
+
+  resetBtn.addEventListener('click', startRound);
+  drawBtn.addEventListener('click', drawCard);
+
+  hand.addEventListener('click', (event) => {
+    const cardButton = event.target.closest('[data-index]');
+    if (!cardButton) return;
+    const index = Number(cardButton.dataset.index);
+    const card = playerHand[index];
+    if (!card || !canPlay(card)) return;
+    playerHand.splice(index, 1);
+    discard.push(card);
+    updateUnoUI();
+  });
+
+  startRound();
 }
 
 function initGames() {
@@ -272,5 +425,6 @@ window.addEventListener('DOMContentLoaded', () => {
   initCalendar();
   initTodo();
   initGames();
+  initUnoGame();
   updateDashboard();
 });

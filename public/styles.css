@@ -379,6 +379,64 @@ input {
   margin-top: 12px;
 }
 
+.uno-panel {
+  margin-top: 12px;
+}
+
+.uno-board {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.uno-label {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+.uno-card {
+  min-width: 62px;
+  min-height: 88px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.uno-card-empty {
+  background: var(--surface-3);
+  color: var(--muted);
+}
+
+.uno-card-rot {
+  background: #7a2e2e;
+}
+
+.uno-card-blau {
+  background: #2f4d7a;
+}
+
+.uno-card-grün {
+  background: #2f6b45;
+}
+
+.uno-card-gelb {
+  background: #8a6d1a;
+}
+
+.uno-hand {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 480px) {
   .form-row {
     flex-direction: column;

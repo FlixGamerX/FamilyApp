@@ -16,8 +16,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 let events = [
-  { id: 1, date: '2026-06-18', text: 'Familienabend' },
-  { id: 2, date: '2026-06-20', text: 'Einkaufen' }
+  { id: 1, date: '2026-06-18', time: '18:00', text: 'Familienabend' },
+  { id: 2, date: '2026-06-20', time: '09:30', text: 'Einkaufen' }
 ];
 
 let todos = [
@@ -49,7 +49,11 @@ function createRoomState(roomId) {
 }
 
 function sortEvents() {
-  events.sort((a, b) => a.date.localeCompare(b.date));
+  events.sort((a, b) => {
+    const dateCompare = a.date.localeCompare(b.date);
+    if (dateCompare !== 0) return dateCompare;
+    return (a.time || '').localeCompare(b.time || '');
+  });
 }
 
 function sendState() {
@@ -115,12 +119,14 @@ io.on('connection', (socket) => {
   socket.on('event:add', (payload) => {
     const text = payload?.text?.trim();
     const date = payload?.date?.trim();
+    const time = payload?.time?.trim();
 
     if (!text || !date) return;
 
     events.push({
       id: Date.now() + Math.random(),
       date,
+      time: time || '',
       text
     });
 
