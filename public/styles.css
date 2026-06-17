@@ -170,11 +170,12 @@ input {
 
 .form-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .form-row input {
-  flex: 1;
+  flex: 1 1 140px;
   background: var(--surface-2);
   color: var(--text);
   border: 1px solid var(--border);
@@ -186,6 +187,14 @@ input {
 
 .form-row input:focus {
   border-color: var(--accent);
+}
+
+.form-row input[type="date"] {
+  min-width: 140px;
+}
+
+.form-row button {
+  flex: 0 0 auto;
 }
 
 .primary-btn,
@@ -223,7 +232,7 @@ input {
 
 .list-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
   padding: 12px;
@@ -239,8 +248,19 @@ input {
 .list-item main {
   display: flex;
   gap: 10px;
-  align-items: center;
+  align-items: flex-start;
   flex: 1;
+  min-width: 0;
+}
+
+.list-item main div {
+  min-width: 0;
+}
+
+.list-item main strong,
+.list-item main span {
+  display: block;
+  word-break: break-word;
 }
 
 .list-item small {
@@ -357,6 +377,37 @@ input {
   color: var(--muted);
   font-size: 0.9rem;
   margin-top: 12px;
+}
+
+@media (max-width: 480px) {
+  .form-row {
+    flex-direction: column;
+  }
+
+  .form-row input,
+  .form-row button {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .section-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .list-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .list-item main {
+    width: 100%;
+  }
+
+  .list-item .icon-btn {
+    align-self: flex-end;
+  }
 }
 
 @media (min-width: 640px) {
